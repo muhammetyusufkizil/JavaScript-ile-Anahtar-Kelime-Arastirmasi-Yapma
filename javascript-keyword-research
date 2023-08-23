@@ -1,0 +1,44 @@
+// Anahtar kelimeyi belirle
+var keyword = "seo";
+
+// Google API anahtarını ve Custom Search Engine ID'yi gir
+var apiKey = "YOUR_API_KEY";
+var cseId = "YOUR_CSE_ID";
+
+// Google Custom Search API'ye istek yap
+var request = new XMLHttpRequest();
+request.open("GET", "https://www.googleapis.com/customsearch/v1?key=" + apiKey + "&cx=" + cseId + "&q=" + keyword, true);
+request.onload = function() {
+  if (request.status >= 200 && request.status < 400) {
+    // İsteğin başarılı olduğu durumda
+    // Yanıtı JSON olarak parse et
+    var response = JSON.parse(request.responseText);
+    // Anahtar kelimenin kaç sonuç verdiğini al
+    var totalResults = response.searchInformation.totalResults;
+    // İlk 10 sıradaki web sitelerinin başlıklarını ve URL'lerini al
+    var items = response.items;
+    var titles = [];
+    var urls = [];
+    for (var i = 0; i < items.length; i++) {
+      titles.push(items[i].title);
+      urls.push(items[i].link);
+    }
+    // Sonuçları konsola yazdır
+    console.log("Anahtar kelime: " + keyword);
+    console.log("Toplam sonuç sayısı: " + totalResults);
+    console.log("İlk 10 sıradaki web siteleri:");
+    for (var i = 0; i < titles.length; i++) {
+      console.log((i+1) + ". " + titles[i] + " - " + urls[i]);
+    }
+  } else {
+    // İsteğin başarısız olduğu durumda
+    // Hata mesajını konsola yazdır
+    console.log("Hata: " + request.status);
+  }
+};
+request.onerror = function() {
+  // İsteğin bağlantı hatası verdiği durumda
+  // Hata mesajını konsola yazdır
+  console.log("Hata: Bağlantı kurulamadı");
+};
+request.send();
